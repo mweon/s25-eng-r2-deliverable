@@ -10,10 +10,11 @@ on the client-side to correctly match component state and props should the order
 React server components don't track state between rerenders, so leaving the uniquely identified components (e.g. SpeciesCard)
 can cause errors with matching props and state in child components if the list order changes.
 */
-import { Button } from "@/components/ui/button";
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
 type Species = Database["public"]["Tables"]["species"]["Row"];
+import SpeciesDetailsDialog from "./species-details-dialog"
+import EditSpeciesDialog from "./edit-species-dialog"
 
 export default function SpeciesCard({ species }: { species: Species }) {
   return (
@@ -26,8 +27,13 @@ export default function SpeciesCard({ species }: { species: Species }) {
       <h3 className="mt-3 text-2xl font-semibold">{species.scientific_name}</h3>
       <h4 className="text-lg font-light italic">{species.common_name}</h4>
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
-      {/* Replace the button with the detailed view dialog. */}
-      <Button className="mt-3 w-full">Learn More</Button>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+        {/* SpeciesDetailsDialog component, passing the species in */}
+        <SpeciesDetailsDialog species={species} />
+        {/* EditSpeciesDialog component, passing in species */}
+        {/* TODO: check if the session id matches the author id */}
+        <EditSpeciesDialog species={species} />
+      </div>
     </div>
   );
 }

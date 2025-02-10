@@ -74,7 +74,7 @@ const defaultValues: Partial<FormData> = {
   description: null,
 };
 
-export default function AddSpeciesDialog({ userId }: { userId: string }) {
+export default function EditSpeciesDialog({ userId }: { userId: string }) {
   const router = useRouter();
 
   // Control open/closed state of the dialog
