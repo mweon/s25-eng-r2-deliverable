@@ -15,8 +15,9 @@ import Image from "next/image";
 type Species = Database["public"]["Tables"]["species"]["Row"];
 import SpeciesDetailsDialog from "./species-details-dialog"
 import EditSpeciesDialog from "./edit-species-dialog"
+import DeleteSpeciesDialog from "./delete-species-dialog";
 
-export default function SpeciesCard({ species }: { species: Species }) {
+export default function SpeciesCard({ species, userId }: { species: Species; userId: string }) {
   return (
     <div className="m-4 w-72 min-w-72 flex-none rounded border-2 p-3 shadow">
       {species.image && (
@@ -29,10 +30,11 @@ export default function SpeciesCard({ species }: { species: Species }) {
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         {/* SpeciesDetailsDialog component, passing the species in */}
-        <SpeciesDetailsDialog species={species} />
-        {/* EditSpeciesDialog component, passing in species */}
-        {/* TODO: check if the session id matches the author id */}
-        <EditSpeciesDialog species={species} />
+        < SpeciesDetailsDialog species={species} />
+        {/* EditSpeciesDialog component, passing the species in if it is the author of the species */}
+        {species.author === userId && <EditSpeciesDialog species={species} />}
+        {/* DeleteSpeciesDialog component, passing the speciesId in if it is the author of the species */}
+        {species.author === userId && <DeleteSpeciesDialog speciesId={species.id} />}
       </div>
     </div>
   );
