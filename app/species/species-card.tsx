@@ -30,7 +30,7 @@ export default function SpeciesCard({ species, userId }: { species: Species; use
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         {/* SpeciesDetailsDialog component, passing the species in */}
-        < SpeciesDetailsDialog species={species} />
+        <SpeciesDetailsDialog species={species} />
         {/* EditSpeciesDialog component, passing the species in if it is the author of the species */}
         {species.author === userId && <EditSpeciesDialog species={species} />}
         {/* DeleteSpeciesDialog component, passing the speciesId in if it is the author of the species */}

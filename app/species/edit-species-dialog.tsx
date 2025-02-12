@@ -19,9 +19,10 @@ import { toast } from "@/components/ui/use-toast";
 import { createBrowserSupabaseClient } from "@/lib/client-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState, type BaseSyntheticEvent } from "react";
+import { useState, useEffect, type BaseSyntheticEvent } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import type { Database } from "@/lib/schema";
 
 // We use zod (z) to define a schema for the "Edit species" form.
 // zod handles validation of the input values with methods like .string(), .nullable(). It also processes the form inputs with .transform() before the inputs are sent to the database.
@@ -66,20 +67,9 @@ All form fields should be set to non-undefined default values.
 Read more here: https://legacy.react-hook-form.com/api/useform/
 */
 
-// Define the species props interface
-interface EditSpeciesDialogProps {
-  species: {
-    id: number;
-    scientific_name: string;
-    common_name: string | null;
-    kingdom: z.infer<typeof kingdoms>;
-    total_population: number | null;
-    image: string | null;
-    description: string | null;
-  }
-}
+type Species = Database["public"]["Tables"]["species"]["Row"];
 
-export default function EditSpeciesDialog({ species }: EditSpeciesDialogProps) {
+export default function EditSpeciesDialog({ species }: { species : Species }) {
   const router = useRouter();
 
   // Control open/closed state of the dialog
@@ -101,6 +91,11 @@ export default function EditSpeciesDialog({ species }: EditSpeciesDialogProps) {
     defaultValues,
     mode: "onChange",
   });
+
+  // useEffect to reset the form values whenever the species prop changes
+  useEffect(() => {
+    form.reset(species);
+  }, [species, form.reset]);
 
   const onSubmit = async (input: FormData) => {
     // The `input` prop contains data that has already been processed by zod. We can now use it in a supabase query

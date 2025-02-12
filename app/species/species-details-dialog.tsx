@@ -32,7 +32,7 @@ export default function SpeciesDetailsDialog({ species }: { species: Species }) 
         </div>
 
         {/* Common Name */}
-                <div>
+        <div>
           <p>
               <span className="font-semibold">Common Name: </span>
               {species.common_name}
