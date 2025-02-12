@@ -33,7 +33,7 @@ const UserField = ({ label, value, isItalic = false }: UserFieldProps) => (
     <p>
       <span className="font-semibold">{label}: </span>
       <span className={isItalic ? "italic" : ""}>
-        {value || "Not provided"} {/* Display "Not provided" if value is null */}
+        {value ?? "Not provided"} {/* Display "Not provided" if value is null */}
       </span>
     </p>
   </div>

@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { SpeciesForm } from "./species-form"
-import { FormData, speciesSchema } from "./species-schema"
+import { type FormData, speciesSchema } from "./species-schema"
 import type { Database } from "@/lib/schema"
 
 // Define the Species type based on the database schema

@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { SpeciesForm } from "./species-form"
-import { FormData, speciesSchema, defaultValues } from "./species-schema"
+import { type FormData, speciesSchema, defaultValues } from "./species-schema"
 
 // Define the props for the AddSpeciesDialog component
 interface AddSpeciesDialogProps {

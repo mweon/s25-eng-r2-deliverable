@@ -86,7 +86,7 @@ export default function DeleteSpeciesDialog({ speciesId }: DeleteSpeciesDialogPr
           <Button
             variant="destructive"
             className="flex-1"
-            onClick={handleDelete}
+            onClick={() => void handleDelete()}
             disabled={isDeleting} // Disable button while deleting
           >
             {isDeleting ? (

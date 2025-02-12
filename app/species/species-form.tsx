@@ -6,7 +6,7 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import { Input, type InputProps } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -15,11 +15,11 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea, type TextareaProps } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { DialogClose } from "@/components/ui/dialog"
-import { UseFormReturn } from "react-hook-form"
-import { FormData, kingdoms } from "./species-schema"
+import { type UseFormReturn } from "react-hook-form"
+import { type FormData, kingdoms } from "./species-schema"
 import { Form } from "@/components/ui/form"
 
 // Define props for the `SpeciesForm` component
@@ -38,7 +38,7 @@ export function SpeciesForm({ form, onSubmit, submitLabel }: SpeciesFormProps) {
     label: string, // Label for the field
     placeholder: string, // Placeholder text for the field
     Component: typeof Input | typeof Textarea = Input, // Component type (Input by default)
-    props: Record<string, any> = {} // Additional props to pass to the component
+    props: Partial<InputProps & TextareaProps > = {} // Additional props to pass to the component
   ) => (
     <FormField
       control={form.control} // Connects the field to react-hook-form's control object
@@ -121,9 +121,10 @@ export function SpeciesForm({ form, onSubmit, submitLabel }: SpeciesFormProps) {
             Input,
             {
               type: "number", // Set input type to number
-              onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-                form.setValue("total_population", +e.target.value) // Convert string input to number and update form state
+              onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                form.setValue("total_population", +e.target.value); // Convert string input to number and update form state
             }
+          }
           )}
 
           {/* Render a text input for "Image URL" */}
