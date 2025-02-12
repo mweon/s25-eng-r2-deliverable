@@ -1,7 +1,8 @@
-"use client";
+"use client"
 
-import { Icons } from "@/components/icons";
-import { Button } from "@/components/ui/button";
+// Import necessary components and utilities
+import { Icons } from "@/components/icons"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -10,57 +11,59 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { toast } from "@/components/ui/use-toast";
-import { createBrowserSupabaseClient } from "@/lib/client-utils";
-import { useRouter } from "next/navigation";
-import { useState, type BaseSyntheticEvent } from "react";
-import { useForm } from "react-hook-form";
+} from "@/components/ui/dialog"
+import { toast } from "@/components/ui/use-toast"
+import { createBrowserSupabaseClient } from "@/lib/client-utils"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
-export default function DeleteSpeciesDialog({ speciesId }: {speciesId: number}) {
-  const router = useRouter();
+// Define the props for the DeleteSpeciesDialog component
+interface DeleteSpeciesDialogProps {
+  speciesId: number // ID of the species to be deleted
+}
 
-  // Control open/closed state of the dialog
-  const [open, setOpen] = useState<boolean>(false);
+// Main component for deleting a species
+export default function DeleteSpeciesDialog({ speciesId }: DeleteSpeciesDialogProps) {
+  const router = useRouter() // Next.js router for navigation and refreshing data
+  const [open, setOpen] = useState(false) // State to control dialog visibility
+  const [isDeleting, setIsDeleting] = useState(false) // State to track deletion process
 
-  // Instantiate form functionality with React Hook Form, passing in the Zod schema (for validation) and default values
-  const form = useForm<FormData>({
-    mode: "onChange",
-  });
+  // Function to handle the delete operation
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true) // Set deletion state to true
+      const supabase = createBrowserSupabaseClient() // Create a Supabase client instance
 
-  const onSubmit = async (input: FormData) => {
-    // The `input` prop contains data that has already been processed by zod. We can now use it in a supabase query
-    const supabase = createBrowserSupabaseClient();
-    const { error } = await supabase
-      .from("species")
-      .delete()
-      .eq('id', speciesId)
+      // Perform delete operation on the 'species' table where the ID matches `speciesId`
+      const { error } = await supabase
+        .from("species")
+        .delete()
+        .eq('id', speciesId)
 
-    // Catch and report errors from Supabase and exit the onSubmit function with an early 'return' if an error occurred.
-    if (error) {
-      return toast({
+      if (error) throw error // Throw an error if the deletion fails
+
+      setOpen(false) // Close the dialog after successful deletion
+      router.refresh() // Refresh the page to reflect changes
+
+      // Show a success toast notification
+      toast({
+        title: "Species successfully deleted!",
+      })
+    } catch (error) {
+      // Show an error toast notification if something goes wrong
+      toast({
         title: "Something went wrong.",
-        description: typeof error.message === "string" ? error.message : "An unknown error occurred.",
+        description: error instanceof Error ? error.message : "An unknown error occurred.",
         variant: "destructive",
-      });
+      })
+    } finally {
+      setIsDeleting(false) // Reset deletion state after completion
     }
-
-    // Because Supabase errors were caught above, the remainder of the function will only execute upon a successful edit
-
-    setOpen(false);
-
-    // Refresh all server components in the current route. This helps display the newly created species because species are fetched in a server component, species/page.tsx.
-    // Refreshing that server component will display the new species from Supabase
-    router.refresh();
-
-    return toast({
-      title: "Species sucessfully deleted!",
-    });
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      {/* Trigger button to open the delete dialog */}
       <DialogTrigger asChild>
         <Button variant="destructive" className="w-full">
           <Icons.trash className="mr-3 h-5 w-5" />
@@ -68,30 +71,43 @@ export default function DeleteSpeciesDialog({ speciesId }: {speciesId: number}) 
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-screen overflow-y-auto sm:max-w-[600px]">
+      {/* Dialog content */}
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Delete Species</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this species?
+            Are you sure you want to delete this species? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={(e: BaseSyntheticEvent) => void form.handleSubmit(onSubmit)(e)}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex">
-                <Button type="submit" className="ml-1 mr-1 flex-auto" variant="destructive">
-                  Delete
-                </Button>
-                <DialogClose asChild>
-                  <Button type="button" className="ml-1 mr-1 flex-auto" variant="secondary">
-                    Cancel
-                  </Button>
-                </DialogClose>
-              </div>
-            </div>
-          </form>
-        </Form>
+
+        {/* Buttons for confirming or canceling the deletion */}
+        <div className="flex gap-3 mt-4">
+          {/* Delete button */}
+          <Button
+            variant="destructive"
+            className="flex-1"
+            onClick={handleDelete}
+            disabled={isDeleting} // Disable button while deleting
+          >
+            {isDeleting ? (
+              <>
+                {/* Spinner icon shown during deletion */}
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              'Delete'
+            )}
+          </Button>
+
+          {/* Cancel button to close the dialog */}
+          <DialogClose asChild>
+            <Button type="button" variant="secondary" className="flex-1">
+              Cancel
+            </Button>
+          </DialogClose>
+        </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

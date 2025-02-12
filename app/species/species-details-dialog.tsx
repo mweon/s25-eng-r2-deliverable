@@ -1,68 +1,90 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
+// Import necessary UI components and types
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import type { Database } from "@/lib/schema";
+} from "@/components/ui/dialog"
+import type { Database } from "@/lib/schema"
 
-// Defines Species type based on the Supabase database schema
-type Species = Database["public"]["Tables"]["species"]["Row"];
+// Define the `Species` type based on the database schema
+type Species = Database["public"]["Tables"]["species"]["Row"]
 
-// Detailed view for a given species' information
-export default function SpeciesDetailsDialog({ species }: { species: Species }) {
+// Props for the `SpeciesDetail` component
+interface SpeciesDetailProps {
+  label: string // The label to display (e.g., "Scientific Name")
+  value: string | number | null // The value associated with the label (can be null)
+  italic?: boolean // Optional flag to render the value in italic
+}
+
+// Component to render a single species detail (label and value)
+function SpeciesDetail({ label, value, italic }: SpeciesDetailProps) {
+  if (value === null) return null // If the value is null, don't render anything
+
+  return (
+    <div className="py-2">
+      {/* Render the label and value */}
+      <p className="flex items-baseline gap-2">
+        <span className="font-semibold min-w-32">{label}:</span>
+        {/* Apply italic styling if `italic` is true */}
+        <span className={italic ? "italic" : ""}>
+          {/* Format numbers with commas for better readability */}
+          {typeof value === 'number' ? value.toLocaleString() : value}
+        </span>
+      </p>
+    </div>
+  )
+}
+
+// Props for the `SpeciesDetailsDialog` component
+interface SpeciesDetailsDialogProps {
+  species: Species // The species object containing its details
+}
+
+// Main component to display species details in a dialog
+export default function SpeciesDetailsDialog({ species }: SpeciesDetailsDialogProps) {
+  // Prepare an array of details to display in the dialog
+  const details = [
+    { label: "Scientific Name", value: species.scientific_name, italic: true },
+    { label: "Common Name", value: species.common_name },
+    { label: "Kingdom", value: species.kingdom },
+    { label: "Total Population", value: species.total_population },
+    { label: "Description", value: species.description },
+  ]
+
   return (
     <Dialog>
-      {/* Triggers the dialog when Learn More button is pushed */}
+      {/* Button to trigger the dialog */}
       <DialogTrigger asChild>
         <Button className="mt-3 w-full">
           Learn More
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-screen overflow-y-auto sm:max-w-[600px]">
-        {/* Scientific Name */}
-        <div>
-          <p>
-              <span className="font-semibold">Scientific Name: </span>
-              <span className="italic">{species.scientific_name}</span>
-          </p>
-        </div>
+      {/* Dialog content */}
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle className="text-xl">
+            Species Details
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Common Name */}
-        <div>
-          <p>
-              <span className="font-semibold">Common Name: </span>
-              {species.common_name}
-          </p>
-        </div>
-
-        {/* Kingdom */}
-        <div>
-          <p>
-              <span className="font-semibold">Kingdom: </span>
-              {species.kingdom}
-          </p>
-        </div>
-
-        {/* Total Population */}
-        <div>
-          <p>
-              <span className="font-semibold">Total Population: </span>
-              {species.total_population}
-          </p>
-        </div>
-
-        {/* Description */}
-        <div>
-          <p>
-              <span className="font-semibold">Description: </span>
-              {species.description}
-          </p>
+        {/* Render all details using the `SpeciesDetail` component */}
+        <div className="space-y-2">
+          {details.map(detail => (
+            <SpeciesDetail
+              key={detail.label} // Use the label as a unique key
+              label={detail.label} // Pass the label (e.g., "Scientific Name")
+              value={detail.value} // Pass the corresponding value
+              italic={detail.italic} // Pass whether the value should be italicized
+            />
+          ))}
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
